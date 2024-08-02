@@ -6,7 +6,7 @@ class RedisClient {
   // constructor creating a redis client.
   constructor() {
     this.client = createClient()
-      .on('ready', () => {
+      .on('connect', () => {
       })
       .on('error', (err) => {
         console.log(err);
@@ -18,14 +18,8 @@ class RedisClient {
   }
 
   // isAlive return ture if connection successful.
-  async isAlive() {
-    try {
-      const response = await this.client.ping();
-      return response === 'PONG';
-    } catch (err) {
-      console.error(`Connection Error: ${err}`);
-      return false;
-    }
+  isAlive() {
+		return this.client.connected;
   }
 
   // async get function
