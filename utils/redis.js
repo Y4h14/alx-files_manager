@@ -19,10 +19,11 @@ class RedisClient {
 
   // isAlive return ture if connection successful.
   isAlive() {
-		return this.client.connected;
+    return this.client.connected;
   }
 
   // async get function
+  // eslint-disable-next-line consistent-return
   async get(key) {
     try {
       const result = await this.getAsync(key);
