@@ -1,6 +1,7 @@
 #!/usr/bin/node
 const crypto = require('crypto');
 const dbClient = require('../utils/db');
+import { ObjectId } from 'mongodb';
 
 class UserController {
   static async postNew(req, res) {
@@ -32,5 +33,16 @@ class UserController {
       return res.status(500).json({ error: 'server error' });
     }
   }
+
+	static async getMe(req, res) {
+		const token = req.headers['X-Token'];
+		const id = redisClient(`auth_${token}`);
+		
+		if (!id) {
+			res.status(401).json({'error': 'Unauthorized'});
+		}
+		const user = dbClient.client.db().collection('users').findOne({ _id: new ObjectId(id) });
+		res.status(200).json({'id': id, 'email': user.email});
+	}
 }
 module.exports = UserController;
