@@ -19,7 +19,8 @@ class UserController {
       .update(password).digest('hex');
 
     try {
-      const usersCollection = dbClient.client.db().collection('users');
+      const database = dbClient.db;
+      const usersCollection = dbClient.client.db(database).collection('users');
       const existingUser = await usersCollection.findOne({ email });
 
       if (existingUser) {
@@ -30,6 +31,7 @@ class UserController {
       const result = await usersCollection.insertOne(newUser);
       return res.status(201).json({ id: result.insertedId, email });
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ error: 'server error' });
     }
   }
