@@ -153,7 +153,7 @@ class FilesController {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     if (!parentId || parentId === '0') {
-      parentId = 0;
+      parentId = '0';
     } else {
       parentId = new ObjectId(parentId);
     }
@@ -161,6 +161,7 @@ class FilesController {
     if (!page) {
       page = 0;
     }
+    page = parseInt(page, 10);
     const pageSize = 20;
     const skip = page * pageSize;
     const limit = pageSize;
@@ -169,7 +170,8 @@ class FilesController {
       { $skip: skip },
       { $limit: limit },
     ];
-    if (parentId !== 0) {
+
+    if (parentId !== '0') {
       pipeline.push({ $match: { userId, parentId } });
     }
 
