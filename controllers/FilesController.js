@@ -152,7 +152,7 @@ class FilesController {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    if (!parentId) {
+    if (!parentId || parentId === '0') {
       parentId = 0;
     } else {
       parentId = new ObjectId(parentId);
@@ -170,7 +170,7 @@ class FilesController {
       { $limit: limit },
     ];
     if (parentId !== 0) {
-      pipeline.push({ $match: { parentId } });
+      pipeline.push({ $match: { userId, parentId } });
     }
 
     const result = await dbClient.client.db(dbClient.db).collection('files').aggregate(pipeline).toArray();
