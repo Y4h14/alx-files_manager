@@ -45,12 +45,15 @@ class FilesController {
     if (!isPublic) {
       isPublic = false;
     }
-    const parent_ = await dbClient.client.db(dbClient.db).collection('files').findOne({ _id: parentId });
-    if (!parent_ && parentId !== 0) {
-      return res.status(400).json({ error: 'Parent not found' });
-    }
-    if (parent_.type !== 'folder' && parentId !== 0) {
-      return res.status(400).json({ error: 'Parent is not a folder' });
+
+    if (parentId !== 0) {
+      const parent_ = await dbClient.client.db(dbClient.db).collection('files').findOne({ _id: parentId });
+      if (!parent_) {
+        return res.status(400).json({ error: 'Parent not found' });
+      }
+      if (parent_.type !== 'folder') {
+        return res.status(400).json({ error: 'Parent is not a folder' });
+      }
     }
     if (type === 'folder') {
       const doc = {
