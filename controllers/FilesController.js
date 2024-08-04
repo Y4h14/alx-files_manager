@@ -171,7 +171,9 @@ class FilesController {
       { $limit: limit },
     ];
 
-    pipeline.push({ $match: { userId: new ObjectId(userId), parentId } });
+    if (parentId !== 0) {
+      pipeline.push({ $match: { userId: new ObjectId(userId), parentId } });
+    }
 
     const result = await dbClient.client.db(dbClient.db).collection('files').aggregate(pipeline).toArray();
     const files = [];
