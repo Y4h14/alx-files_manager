@@ -275,9 +275,11 @@ class FilesController {
     if (!file) {
       return res.status(404).json({ error: 'Not found' });
     }
+    console.log(userId);
+    console.log(file.userId);
 
     if (file.isPublic === false) {
-      if (!userId || file.userId !== new ObjectId(userId)) {
+      if (!userId || file.userId.toString() !== userId.toString()) {
         return res.status(404).json({ error: 'Not found' });
       }
     }
