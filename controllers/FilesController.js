@@ -193,7 +193,7 @@ class FilesController {
   }
 
   static async putPublish(req, res) {
-    const { id } = req.param;
+    const { id } = req.params;
     const token = req.headers['x-token'];
 
     if (!token) {
@@ -208,13 +208,14 @@ class FilesController {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     const query = { _id: new ObjectId(id), userId: new ObjectId(userId) };
-    const file = await dbClient.client.db(dbClient.db).collection('files').findOne(query);
+    let file = await dbClient.client.db(dbClient.db).collection('files').findOne(query);
     if (!file) {
       return res.status(404).json({ error: 'Not found' });
     }
     try {
       const update = { $set: { isPublic: true } };
       await dbClient.client.db(dbClient.db).collection('files').updateOne({ _id: new ObjectId(id) }, update);
+      file = await dbClient.client.db(dbClient.db).collection('files').findOne(query);
       return res.status(200).json({
         id: file._id,
         userId: file.userId,
@@ -229,7 +230,7 @@ class FilesController {
   }
 
   static async putUnpublish(req, res) {
-    const { id } = req.param;
+    const { id } = req.params;
     const token = req.headers['x-token'];
 
     if (!token) {
@@ -243,13 +244,14 @@ class FilesController {
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const file = await dbClient.client.db(dbClient.db).collection('files').findOne({ _id: new ObjectId(id) });
+    let file = await dbClient.client.db(dbClient.db).collection('files').findOne({ _id: new ObjectId(id) });
     if (!file) {
       return res.status(404).json({ error: 'Not found' });
     }
     try {
       const update = { $set: { isPublic: false } };
-      await dbClient.client.db(dbClient.db).collection('file').updateOne({ _id: new ObjectId(id) }, update);
+      await dbClient.client.db(dbClient.db).collection('files').updateOne({ _id: new ObjectId(id) }, update);
+      file = await dbClient.client.db(dbClient.db).collection('files').findOne({ _id: new ObjectId(id) });
       return res.status(200).json({
         id: file._id,
         userId: file.userId,
