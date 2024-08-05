@@ -275,8 +275,6 @@ class FilesController {
     if (!file) {
       return res.status(404).json({ error: 'Not found' });
     }
-    console.log(userId);
-    console.log(file.userId);
 
     if (file.isPublic === false) {
       if (!userId || file.userId.toString() !== userId.toString()) {
@@ -292,14 +290,10 @@ class FilesController {
       return res.status(404).json({ error: 'Not found' });
     }
     const contentType = mime.contentType(file.name);
-    try {
-      const data = fs.readFileSync(filePath);
-
+    if (contentType) {
       res.type(contentType);
-      return res.status(200).send(data);
-    } catch (err) {
-      return res.status(500).json({ error: 'Server error' });
     }
+    return res.sendFile(filePath);
   }
 }
 module.exports = FilesController;
