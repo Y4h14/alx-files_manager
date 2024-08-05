@@ -225,7 +225,7 @@ class FilesController {
         parentId: file.parentId,
       });
     } catch (err) {
-      return console.log(err);
+      return res.status(500).json({ error: 'Server error' });
     }
   }
 
@@ -261,7 +261,7 @@ class FilesController {
         parentId: file.parentId,
       });
     } catch (err) {
-      return console.log(err);
+      return res.status(500).json({ error: 'Server error' });
     }
   }
 }
