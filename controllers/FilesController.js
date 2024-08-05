@@ -214,10 +214,17 @@ class FilesController {
     }
     try {
       const update = { $set: { isPublic: true } };
-      const result = await dbClient.client.db(dbClient.db).collection('file').updateOne({ _id: new ObjectId(id) }, update);
-      return res.status(200).json(file);
+      await dbClient.client.db(dbClient.db).collection('files').updateOne({ _id: new ObjectId(id) }, update);
+      return res.status(200).json({
+        id: file._id,
+        userId: file.userId,
+        name: file.name,
+        type: file.type,
+        isPublic: file.isPublic,
+        parentId: file.parentId,
+      });
     } catch (err) {
-      console.log(err);
+      return console.log(err);
     }
   }
 
@@ -242,10 +249,17 @@ class FilesController {
     }
     try {
       const update = { $set: { isPublic: false } };
-      const result = await dbClient.client.db(dbClient.db).collection('file').updateOne({ _id: new ObjectId(id) }, update);
-      return res.status(200).json(file);
+      await dbClient.client.db(dbClient.db).collection('file').updateOne({ _id: new ObjectId(id) }, update);
+      return res.status(200).json({
+        id: file._id,
+        userId: file.userId,
+        name: file.name,
+        type: file.type,
+        isPublic: file.isPublic,
+        parentId: file.parentId,
+      });
     } catch (err) {
-      console.log(err);
+      return console.log(err);
     }
   }
 }
