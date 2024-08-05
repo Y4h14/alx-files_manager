@@ -6,6 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const mime = require('mime-types');
 const dbClient = require('../utils/db');
 const redisClient = require('../utils/redis');
+const fileQueue = require('../utils/queue');
 
 class FilesController {
   static async postUpload(req, res) {
@@ -96,6 +97,10 @@ class FilesController {
       };
       const result = await dbClient.client.db(dbClient.db).collection('files').insertOne(doc);
       const file = result.ops[0];
+      // adding a job to the bull queue to create thumbnail
+      if (file.type === 'image') {
+        fileQueue.addJob(result.insertedId, userId);
+      }
       return res.status(201).json({
         id: result.insertedId,
         userId,
@@ -267,7 +272,7 @@ class FilesController {
   }
 
   static async getFile(req, res) {
-    const { id } = req.params;
+    const { id, size } = req.params;
     const token = req.headers['x-token'];
     const userId = await redisClient.get(`auth_${token}`);
 
@@ -285,7 +290,10 @@ class FilesController {
       return res.status(400).json({ error: "A folder doesn't have content" });
     }
 
-    const filePath = file.localPath;
+    // here we modify the file path to acocunt for the size
+    // const filePath = file.localPath;
+    const filePath = `${file.localPath}_${size}`;
+
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: 'Not found' });
     }
