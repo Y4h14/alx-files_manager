@@ -191,5 +191,62 @@ class FilesController {
 
     return res.status(200).json(files);
   }
+
+  static async putPublish(req, res) {
+    const { id } = req.param;
+    const token = req.headers['x-token'];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const userId = await redisClient.get(`auth_${token}`);
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const user = await dbClient.client.db(dbClient.db).collection('users').findOne({ _id: new ObjectId(userId) });
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const query = { _id: new ObjectId(id), userId: new ObjectId(userId) };
+    const file = await dbClient.client.db(dbClient.db).collection('files').findOne(query);
+    if (!file) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    try {
+      const update = { $set: { isPublic: true } };
+      const result = await dbClient.client.db(dbClient.db).collection('file').updateOne({ _id: new ObjectId(id) }, update);
+      return res.status(200).json(file);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  static async putUnpublish(req, res) {
+    const { id } = req.param;
+    const token = req.headers['x-token'];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const userId = await redisClient.get(`auth_${token}`);
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const user = await dbClient.client.db(dbClient.db).collection('users').findOne({ _id: new ObjectId(userId) });
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const file = await dbClient.client.db(dbClient.db).collection('files').findOne({ _id: new ObjectId(id) });
+    if (!file) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    try {
+      const update = { $set: { isPublic: false } };
+      const result = await dbClient.client.db(dbClient.db).collection('file').updateOne({ _id: new ObjectId(id) }, update);
+      return res.status(200).json(file);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }
 module.exports = FilesController;
