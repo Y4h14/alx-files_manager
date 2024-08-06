@@ -291,8 +291,10 @@ class FilesController {
     }
 
     // here we modify the file path to acocunt for the size
-    // const filePath = file.localPath;
-    const filePath = `${file.localPath}_${size}`;
+    let filePath = file.localPath;
+    if (size) {
+      filePath = `${file.localPath}_${size}`;
+    }
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: 'Not found' });
