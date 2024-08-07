@@ -13,3 +13,5 @@ app.use('/', router);
 app.listen(port, () => {
   console.log(`server listining on port ${port}`);
 });
+
+module.exports = app;
